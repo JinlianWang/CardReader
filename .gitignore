@@ -1,4 +1,5 @@
 input_data/*
 cardsProcessed/*
 backsProcessed/*
+data_utils/__pycache__/*
 
