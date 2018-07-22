@@ -25,7 +25,7 @@ def get_filenames_and_labels(card_path):
 
 def generate_image_pipeline(X_files, y_data, save_folder, folder_type, bg_img_folder,
 							start_background_index, total_base_images,
-                            scales = [0.40, 0.43, 0.46, 0.48, 0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85],
+                            scales = [0.80, 0.81, 0.82, 0.83, 0.84, 0.85],
                             angles = [0], angle_repeat_ratio = [1]):
     # In case, the number of cards are very less, to keep the logic simple, 
     # set the batch size not larger than number of cards.
