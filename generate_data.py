@@ -34,11 +34,11 @@ def generate_image_pipeline(X_files, y_data, save_folder, folder_type, bg_img_fo
     # Folder for saving generated images.
     save_img_folder = '{}/{}_{}'.format(save_folder, GENERATED_DATA, folder_type)
     shutil.rmtree(save_img_folder, ignore_errors = True)
-    os.mkdir(save_img_folder)
+    os.makedirs(save_img_folder)
     # Folder for saving annotation XML files.
     save_xml_folder = '{}/{}_{}'.format(save_folder, XML_FOLDER, folder_type)
     shutil.rmtree(save_xml_folder, ignore_errors = True)
-    os.mkdir(save_xml_folder)
+    os.makedirs(save_xml_folder)
     # File for saving labels.
     file_name = '{}/{}_{}.txt'.format(save_folder, LABEL, folder_type)
     if os.path.exists(file_name):
