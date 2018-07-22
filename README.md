@@ -1,4 +1,4 @@
-CardReader Data Processor
+CardReader Data Processor. This repo contains a few python scripts to create training and testing dataset for card reader. All the images (cards and backgrounds) are downloaded from internet; their copyright belongs to the original author and shall be used for demo only. 
 
 * Process the card images: 
 
