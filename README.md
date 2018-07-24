@@ -5,6 +5,10 @@ CardReader Data Processor. This repo contains a few python scripts to create tra
 ```
 conda env create -f envCards.yml
 ```
+After the environment is created successfully, use the following command to activate the environment: 
+```
+conda activate envCards
+```
 
 * Process the card images: 
 
