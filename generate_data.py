@@ -129,7 +129,7 @@ def parse_args():
     parser.add_argument('card_folder', help = 'Where cards are present', type = str)
     parser.add_argument('bg_img_folder', help = 'Where background images are present', type = str)
     parser.add_argument('--save-folder', dest = 'save_folder', help = 'Where the generated files are to be stored', 
-            default = os.path.join(os.getcwd(), 'input_data'), type = str)
+            default = os.path.join('./', 'input_data'), type = str)
     args = parser.parse_args()
     return args
 

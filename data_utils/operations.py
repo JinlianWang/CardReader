@@ -224,7 +224,7 @@ def tf_generate_images(card_file_names, card_labels, bg_img_folder, save_img_fol
         save_location = '{}/{:06d}.png'.format(save_img_folder, current_save_index)
         mpimg.imsave(save_location, background_img)
         
-        img_full_path = os.path.join(cwd, save_location)
+        img_full_path = os.path.join('', save_location)
         write_xml_file(boxes, image_card_labels, background_img.shape, img_full_path, save_xml_folder,
                       is_truncated_array, is_difficult_array, is_occluded_array)
         
