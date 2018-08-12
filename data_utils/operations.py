@@ -9,6 +9,9 @@ from math import ceil, floor, pi, sqrt
 from data_utils.write_xml_file import write_xml_file
 from data_utils.constants import LABEL, IMAGE_SIZE, CARD_HEIGHT, CARD_WIDTH
 
+# For inverting images
+from skimage import util
+
 img_placeholder = None
 resize_placeholder = None
 tf_img = None
@@ -213,11 +216,13 @@ def tf_generate_images(card_file_names, card_labels, bg_img_folder, save_img_fol
 
             card_index_at += 1
 
-        noise_type = random.randint(0, 2)   # 0: None, 1: Gaussian, 2: Pepper
+        noise_type = random.randint(0, 3)   # 0: None, 1: Gaussian, 2: Pepper, 3: Invert (numpy function)
         if noise_type == 1:
             background_img = add_gaussian_noise(background_img)
         elif noise_type == 2:
             background_img = add_salt_pepper_noise(background_img)
+        elif noise_type == 3:
+            background_img = util.invert(background_img)
 
         save_location = '{}/{:06d}.png'.format(save_img_folder, current_save_index)
         mpimg.imsave(save_location, background_img)
