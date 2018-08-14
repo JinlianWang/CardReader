@@ -9,6 +9,9 @@ from math import ceil, floor, pi, sqrt
 from data_utils.write_xml_file import write_xml_file
 from data_utils.constants import LABEL, IMAGE_SIZE, CARD_HEIGHT, CARD_WIDTH
 
+# For inverting images
+from skimage import util
+
 img_placeholder = None
 resize_placeholder = None
 tf_img = None
@@ -25,8 +28,6 @@ def instantiate_global_variables():
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
 
-
-
 def tf_resize_images_with_white_bg(img, image_width, image_height, white_area_percent):
     # Estimate coordinates of the image inside white border based percentage area of white border.
     box_area = image_width * image_height
@@ -36,9 +37,9 @@ def tf_resize_images_with_white_bg(img, image_width, image_height, white_area_pe
     width_start = ceil((image_width - resized_width) / 2.0)
     height_start = ceil((image_height - resized_height) / 2.0)
 
-    resized_img = sess.run(tf_img, feed_dict = {img_placeholder: img, 
+    resized_img = sess.run(tf_img, feed_dict = {img_placeholder: img,
                                                 resize_placeholder: [resized_height, resized_width]})
-       
+
     return_img = np.ones((len(resized_img), image_height, image_width, 3), dtype = np.float32)
     for index, r_img in enumerate(resized_img):
         return_img[index, height_start : height_start + resized_height,
@@ -59,7 +60,7 @@ def save_img_as_png(X_file_data, file_name, folder_name):
     file_name_comp = file_name.split('.')
     new_file_name = '{}/{}.png'.format(folder_name, '_'.join(file_name_comp[:-1]))
     mpimg.imsave(new_file_name, X_file_data)
-    
+
 def fetch_image_files(label_list):
     image_array = []
     for file_path in label_list:
@@ -127,7 +128,7 @@ def tf_generate_images(card_file_names, card_labels, bg_img_folder, save_img_fol
         background_file = '{}/{:06d}.png'.format(bg_img_folder, current_background_index)
         background_img = mpimg.imread(background_file)[:, :, :3]
 
-        
+
         no_of_files = no_of_files_array[i]
         is_difficult_array, is_truncated_array, is_occluded_array = [], [], []
         boxes, image_card_labels = [], []
@@ -142,7 +143,7 @@ def tf_generate_images(card_file_names, card_labels, bg_img_folder, save_img_fol
             elif file_index == 1:
                 end_index_x, end_index_y = IMAGE_SIZE, IMAGE_SIZE
                 start_index_x, start_index_y = ceil(IMAGE_SIZE / 2.0), 0
-                                
+
             # Truncation
             should_truncate_choice = random.choice([True, False])
             # Avoiding Truncation in this case always
@@ -159,7 +160,7 @@ def tf_generate_images(card_file_names, card_labels, bg_img_folder, save_img_fol
                         background_start_x = 0 + start_index_x
                         background_end_x = card_end_x - card_start_x + start_index_x
                     else:
-                        card_start_x = 0 
+                        card_start_x = 0
                         card_end_x = ceil(card_file_shape[0] * (100.0 - truncate_percent_x) / 100.0)
                         background_start_x = end_index_x - (card_end_x - card_start_x)
                         background_end_x = end_index_x
@@ -168,7 +169,7 @@ def tf_generate_images(card_file_names, card_labels, bg_img_folder, save_img_fol
                     background_start_x = random.randint(start_index_x, end_index_x - card_file_shape[0])
                     background_end_x = background_start_x + card_file_shape[0]
                     truncate_percent_x = 0
-                
+
                 # For y-axis
                 if truncation_in in [1, 2]:
                     truncate_percent_y = random.randint(10, 35)
@@ -179,7 +180,7 @@ def tf_generate_images(card_file_names, card_labels, bg_img_folder, save_img_fol
                         background_start_y = 0 + start_index_y
                         background_end_y = card_end_y - card_start_y + start_index_y
                     else:
-                        card_start_y = 0 
+                        card_start_y = 0
                         card_end_y = ceil(card_file_shape[1] * (100.0 - truncate_percent_y) / 100.0)
                         background_start_y = end_index_y - (card_end_y - card_start_y)
                         background_end_y = end_index_y
@@ -188,7 +189,7 @@ def tf_generate_images(card_file_names, card_labels, bg_img_folder, save_img_fol
                     background_start_y = random.randint(start_index_y, end_index_y - card_file_shape[1])
                     background_end_y = background_start_y + card_file_shape[1]
                     truncate_percent_y = 0
-                    
+
                 is_difficult = (truncate_percent_x + truncate_percent_y) > 40
                 is_occluded = (truncate_percent_x + truncate_percent_y) > 55
                 is_truncated = True
@@ -196,38 +197,40 @@ def tf_generate_images(card_file_names, card_labels, bg_img_folder, save_img_fol
                 card_start_x, card_end_x = 0, card_file_shape[0]
                 background_start_x = random.randint(start_index_x, end_index_x - card_file_shape[0])
                 background_end_x = background_start_x + card_file_shape[0]
-                
+
                 card_start_y, card_end_y = 0, card_file_shape[1]
                 background_start_y = random.randint(start_index_y, end_index_y - card_file_shape[1])
                 background_end_y = background_start_y + card_file_shape[1]
-                
+
                 is_difficult = False
                 is_truncated = False
                 is_occluded = False
 
             background_img[background_start_x: background_end_x, background_start_y: background_end_y, :] = card_files_op[card_index_at,\
-                card_start_x : card_end_x, card_start_y : card_end_y, :]       
+                card_start_x : card_end_x, card_start_y : card_end_y, :]
             boxes.append((background_start_y, background_start_x, background_end_y, background_end_x))
             image_card_labels.append(card_labels[card_index_at])
             is_difficult_array.append(is_difficult)
             is_truncated_array.append(is_truncated)
             is_occluded_array.append(is_occluded)
-            
+
             card_index_at += 1
-        
-        noise_type = random.randint(0, 2)   # 0: None, 1: Gaussian, 2: Pepper
+
+        noise_type = random.randint(0, 3)   # 0: None, 1: Gaussian, 2: Pepper, 3: Invert (numpy function)
         if noise_type == 1:
             background_img = add_gaussian_noise(background_img)
         elif noise_type == 2:
             background_img = add_salt_pepper_noise(background_img)
-            
+        elif noise_type == 3:
+            background_img = util.invert(background_img)
+
         save_location = '{}/{:06d}.png'.format(save_img_folder, current_save_index)
         mpimg.imsave(save_location, background_img)
-        
+
         img_full_path = os.path.join('', save_location)
         write_xml_file(boxes, image_card_labels, background_img.shape, img_full_path, save_xml_folder,
                       is_truncated_array, is_difficult_array, is_occluded_array)
-        
+
         current_save_index += 1
     return current_background_index, no_of_files_array, card_labels
 
